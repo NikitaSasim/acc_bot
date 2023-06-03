@@ -55,9 +55,14 @@ import requests
 #
 #     return(completion.choices[0].text)
 
-def gpt(message: types.Message):
-    url = "http://127.0.0.1:8000/"
-    response = requests.get(url).headers
+def incomes_categories(message: types.Message):
+    print(message.from_user.id)
+    url = "http://127.0.0.1:8000/api/incomes_categories/"
+    params = {
+        'user': 1,
+    }
+    response = requests.get(url, params)
 
 
-    return response
+
+    return response.json()
