@@ -1,4 +1,4 @@
-config.py
+../test/config.py
 .idea
 .env
 **/env/
