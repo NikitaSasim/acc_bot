@@ -39,6 +39,16 @@ async def menu_no(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer(text='💵💵💵💵💵💵💵💵💵💵💵💵💵💵💵', reply_markup=ReplyKeyboardRemove())
     await callback.message.answer(text.menu, reply_markup=kb.menu)
 
+
+
+
+
+@router.callback_query(F.data == "recommendations")
+async def recommendations(callback: CallbackQuery):
+    # rec = utils.gpt(callback)
+
+    await callback.message.answer(text=utils.gpt(callback), reply_markup=kb.menu)
+
 """
 Income filling
 """

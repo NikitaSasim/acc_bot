@@ -6,38 +6,34 @@ from aiogram.types import Message, CallbackQuery
 
 import config
 
-openai.api_key = config.OPENAI_TOKEN
 import json
 
 
-async def generate_text(prompt) -> dict:
-    try:
-        response = await openai.ChatCompletion.acreate(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "user", "content": prompt}
-            ]
-        )
-        return response['choices'][0]['message']['content'], response['usage']['total_tokens']
-    except Exception as e:
-        logging.error(e)
+def gpt(callback: CallbackQuery):
+
+    openai.api_key = config.OPENAI_TOKEN
+    print(openai.api_key)
+    model_engine = "gpt-3.5-turbo"
+    data = str(get_user(callback))
+    print(data)
+    prompt = f'look at this json, analyze my income and expenses and give your recommendations: {data}'
+    print(prompt)
+    response = openai.Completion.create(
+        model="text-davinci-003",
+        prompt=prompt,
+        temperature=0.9,
+        max_tokens=150,
+        top_p=1,
+        frequency_penalty=0.0,
+        presence_penalty=0.6,
+        stop=[" Human:", " AI:"]
+    )
+    print(response)
+
+    return(response.choices[0].text)
 
 
-async def generate_image(prompt, n=1, size="1024x1024") -> list[str]:
-    try:
-        response = await openai.Image.acreate(
-            prompt=prompt,
-            n=n,
-            size=size
-        )
-        urls = []
-        for i in response['data']:
-            urls.append(i['url'])
-    except Exception as e:
-        logging.error(e)
-        return []
-    else:
-        return urls
+
 
 
 def incomes_categories(callback: CallbackQuery):
@@ -73,12 +69,10 @@ def get_user(callback: CallbackQuery):
 def post_income(data):
     url = "http://127.0.0.1:8000/api/post_income/"
     # acc_token = config.ACC_TOKEN
-    # params = data
-    # # params["token"] = acc_token
-    # data = json.dumps(params)
-    print(data)
+
+
     response = requests.post(url, data=data)
 
-    print(response.status_code)
+
     return response.status_code
 
