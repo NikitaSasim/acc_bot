@@ -7,6 +7,7 @@ from aiogram.types import Message, CallbackQuery
 import config
 
 openai.api_key = config.OPENAI_TOKEN
+import json
 
 
 async def generate_text(prompt) -> dict:
@@ -54,9 +55,30 @@ def incomes_categories(callback: CallbackQuery):
 
     return categories, categories_names
 
+def get_user(callback: CallbackQuery):
+    user_id = callback.from_user.id
+    print(user_id)
+    url = "http://127.0.0.1:8000/api/user/"
+    acc_token = config.ACC_TOKEN
+    print(acc_token)
+    params = {
+        'user': user_id,
+        'token': acc_token
+    }
+    response = requests.get(url, params)
+    print(response.json())
+
+    return response.json()
+
 def post_income(data):
     url = "http://127.0.0.1:8000/api/post_income/"
-    response = requests.post(url, params=data)
+    # acc_token = config.ACC_TOKEN
+    # params = data
+    # # params["token"] = acc_token
+    # data = json.dumps(params)
+    print(data)
+    response = requests.post(url, data=data)
+
     print(response.status_code)
     return response.status_code
 

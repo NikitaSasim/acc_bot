@@ -85,7 +85,10 @@ async def process_income_category(message: types.Message, state=FSMContext):
 @router.message(IncomeForm.income_date)
 async def process_income_date(message: types.Message, state=FSMContext):
     try:
-        await state.update_data(income_date=datetime.strptime(message.text, '%d.%m.%Y'))
+        date = datetime.strptime(message.text, '%d.%m.%Y')
+        date = datetime.date(date)
+        print(date)
+        await state.update_data(income_date=date)
         await state.set_state(IncomeForm.income_amount)
         await message.answer(
             "Input income amount",
@@ -141,8 +144,16 @@ async def add_income(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     await state.update_data(income_category=IncomeForm.categories_dict[data['income_category']])
     data = await state.get_data()
-    data['income_user'] = callback.from_user.id
-    await callback.message.answer( utils.post_income(data), reply_markup=kb.exit_kb)
+
+    params = {
+        "user": utils.get_user(callback)["user"],
+        "category": data["income_category"],
+        "date": data["income_date"].strftime("%Y.%m.%d"),
+        "amount": data["income_amount"],
+        "narration": data["income_narration"],
+    }
+    print(params)
+    await callback.message.answer(utils.post_income(params), reply_markup=kb.exit_kb)
 
 
 
