@@ -8,6 +8,22 @@ import config
 
 import json
 
+acc_token = config.ACC_TOKEN
+
+async def set_id(message: Message):
+    message_list = message.text.split()
+    if len(message_list) == 2:
+        key = message_list[1]
+        print(key)
+        url = "http://127.0.0.1:8000/api/add_tg/"
+        data = {
+            "key": key,
+            "user": message.from_user.id,
+            'token': acc_token
+        }
+        response = requests.post(url, data=data)
+        print(response.status_code)
+
 
 def gpt(callback: CallbackQuery):
 
@@ -28,17 +44,13 @@ def gpt(callback: CallbackQuery):
         presence_penalty=0.6,
         stop=[" Human:", " AI:"]
     )
-    print(response)
 
     return(response.choices[0].text)
 
 
-
-
-
 def incomes_categories(callback: CallbackQuery):
     user_id = callback.from_user.id
-    print(user_id)
+
     url = "http://127.0.0.1:8000/api/incomes_categories/"
     params = {
         'user': user_id,
@@ -51,12 +63,12 @@ def incomes_categories(callback: CallbackQuery):
 
     return categories, categories_names
 
+
 def get_user(callback: CallbackQuery):
     user_id = callback.from_user.id
     print(user_id)
     url = "http://127.0.0.1:8000/api/user/"
-    acc_token = config.ACC_TOKEN
-    print(acc_token)
+
     params = {
         'user': user_id,
         'token': acc_token
@@ -66,10 +78,9 @@ def get_user(callback: CallbackQuery):
 
     return response.json()
 
+
 def post_income(data):
     url = "http://127.0.0.1:8000/api/post_income/"
-    # acc_token = config.ACC_TOKEN
-
 
     response = requests.post(url, data=data)
 

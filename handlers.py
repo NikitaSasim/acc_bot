@@ -5,6 +5,7 @@ from datetime import datetime
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.utils.deep_linking import decode_payload
 
 import utils
 from states import IncomeForm, ExpenseForm
@@ -17,8 +18,12 @@ router = Router()
 """
 Common menus and functions
 """
+
 @router.message(Command("start"))
 async def start_handler(message: Message, state: FSMContext):
+    if len(message.text.split()) > 1:
+        await utils.set_id(message)
+
     await state.clear()
     await message.answer(text='💵💵💵💵💵💵💵💵💵💵💵💵💵💵💵', reply_markup=ReplyKeyboardRemove())
     await message.answer(text.greet.format(name=message.from_user.full_name), reply_markup=kb.menu)
@@ -29,6 +34,7 @@ async def start_handler(message: Message, state: FSMContext):
 @router.message(F.text == "◀️ Exit to main menu")
 async def menu(message: Message, state: FSMContext):
     await state.clear()
+
     await message.answer(text='💵💵💵💵💵💵💵💵💵💵💵💵💵💵💵', reply_markup=ReplyKeyboardRemove())
     await message.answer(text.menu, reply_markup=kb.menu)
 
@@ -68,8 +74,11 @@ async def add_income(callback: CallbackQuery, state: FSMContext):
         if i % 2 != 0:
             keyboard.append(keys)
             keys = []
-
-    keyboard.append([kb.exit_key, ])
+    if keys == []:
+        keyboard.append([kb.exit_key, ])
+    else:
+        keys.append(kb.exit_key)
+        keyboard.append(keys)
     markup = ReplyKeyboardMarkup(keyboard=keyboard, resize_keyboard=True, selective=True, )
 
 
@@ -86,6 +95,7 @@ async def process_income_category_invalid(message: types.Message):
 async def process_income_category(message: types.Message, state=FSMContext):
     IncomeForm.category = message.text
     await state.update_data(income_category=message.text)
+
     await state.set_state(IncomeForm.income_date)
     await message.answer(
         "Input income date \n in format: DD.MM.YYY",
@@ -97,7 +107,7 @@ async def process_income_date(message: types.Message, state=FSMContext):
     try:
         date = datetime.strptime(message.text, '%d.%m.%Y')
         date = datetime.date(date)
-        print(date)
+
         await state.update_data(income_date=date)
         await state.set_state(IncomeForm.income_amount)
         await message.answer(
