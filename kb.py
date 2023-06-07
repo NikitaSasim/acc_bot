@@ -15,3 +15,7 @@ income_confirmation_kb = InlineKeyboardMarkup(inline_keyboard=[
                                                             [InlineKeyboardButton(text="Yes", callback_data="post_income"),
                                                              InlineKeyboardButton(text="No", callback_data="menu")]
                                                             ])
+expense_confirmation_kb = InlineKeyboardMarkup(inline_keyboard=[
+                                                            [InlineKeyboardButton(text="Yes", callback_data="post_expense"),
+                                                             InlineKeyboardButton(text="No", callback_data="menu")]
+                                                            ])

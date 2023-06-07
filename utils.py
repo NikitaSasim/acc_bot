@@ -5,6 +5,7 @@ import requests
 from aiogram.types import Message, CallbackQuery
 
 import config
+import text
 
 import json
 
@@ -63,6 +64,22 @@ def incomes_categories(callback: CallbackQuery):
 
     return categories, categories_names
 
+def expenses_categories(callback: CallbackQuery):
+    user_id = callback.from_user.id
+
+    url = "http://127.0.0.1:8000/api/expenses_categories/"
+    params = {
+        'user': user_id,
+    }
+    response = requests.get(url, params)
+    print(response.content)
+    categories = {item['name']: item['id'] for item in response.json()}
+    print(categories)
+    categories_names = tuple(categories)
+    print(categories_names)
+
+    return categories, categories_names
+
 
 def get_user(callback: CallbackQuery):
     user_id = callback.from_user.id
@@ -74,7 +91,7 @@ def get_user(callback: CallbackQuery):
         'token': acc_token
     }
     response = requests.get(url, params)
-    print(response.json())
+
 
     return response.json()
 
@@ -84,6 +101,20 @@ def post_income(data):
 
     response = requests.post(url, data=data)
 
+    if response.status_code == 201:
+        return text.data_saved
+    else:
+        return text.data_unsaved
 
-    return response.status_code
+def post_expense(data):
+    url = "http://127.0.0.1:8000/api/post_expense/"
+
+    response = requests.post(url, data=data)
+
+    if response.status_code == 201:
+        return text.data_saved
+    else:
+        return text.data_unsaved
+
+
 

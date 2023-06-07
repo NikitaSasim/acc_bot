@@ -59,6 +59,7 @@ async def recommendations(callback: CallbackQuery):
 Income filling
 """
 
+
 @router.callback_query(F.data == "income")
 async def add_income(callback: CallbackQuery, state: FSMContext):
 
@@ -102,6 +103,7 @@ async def process_income_category(message: types.Message, state=FSMContext):
         reply_markup=kb.exit_kb,
     )
 
+
 @router.message(IncomeForm.income_date)
 async def process_income_date(message: types.Message, state=FSMContext):
     try:
@@ -120,6 +122,7 @@ async def process_income_date(message: types.Message, state=FSMContext):
             reply_markup=kb.exit_kb,
         )
 
+
 @router.message(IncomeForm.income_amount)
 async def process_income_amount(message: types.Message, state=FSMContext):
     try:
@@ -135,6 +138,7 @@ async def process_income_amount(message: types.Message, state=FSMContext):
     await message.answer(
         "Input income narration",
         reply_markup=kb.exit_kb,)
+
 
 @router.message(IncomeForm.income_narration)
 async def process_income_narration(message: types.Message, state=FSMContext):
@@ -152,14 +156,15 @@ async def process_income_narration(message: types.Message, state=FSMContext):
     #                      reply_markup=kb.income_confirmation_kb)
     data = await state.get_data()
 
-    await message.answer(text.income_confirmation.format(
+    await message.answer(text.confirmation.format(
         category=data['income_category'],
         date=data['income_date'].strftime("%d.%m.%Y"),
         ammount=data['income_amount'],
         narration=data['income_narration']
     ), reply_markup=kb.income_confirmation_kb)
 
-@router.callback_query(F.data == "post_income")
+
+@router.callback_query(F.data == "post_income", IncomeForm.income_is_ready)
 async def add_income(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     await state.update_data(income_category=IncomeForm.categories_dict[data['income_category']])
@@ -175,40 +180,127 @@ async def add_income(callback: CallbackQuery, state: FSMContext):
     print(params)
     await callback.message.answer(utils.post_income(params), reply_markup=kb.exit_kb)
 
+"""
+Expenses filling
+"""
+
+@router.callback_query(F.data == "expense")
+async def add_expense(callback: CallbackQuery, state: FSMContext):
+
+    await state.set_state(ExpenseForm.expense_category)
+
+    keyboard = []
+    keys = []
+    ExpenseForm.categories = utils.expenses_categories(callback)[1]
+    ExpenseForm.categories_dict = utils.expenses_categories(callback)[0]
+    for i in range(len(ExpenseForm.categories)):
+        key = KeyboardButton(text=ExpenseForm.categories[i])
+        keys.append(key)
+        if i % 2 != 0:
+            keyboard.append(keys)
+            keys = []
+    if keys == []:
+        keyboard.append([kb.exit_key, ])
+    else:
+        keys.append(kb.exit_key)
+        keyboard.append(keys)
+    markup = ReplyKeyboardMarkup(keyboard=keyboard, resize_keyboard=True, selective=True, )
 
 
+    await callback.message.answer("What is your category?", reply_markup=markup)
 
 
+@router.message(lambda message: message.text not in ExpenseForm.categories, ExpenseForm.expense_category)
+async def process_expense_category_invalid(message: types.Message):
+
+    return await message.reply(f"Bad category name. Choose category from the keyboard.")
 
 
+@router.message(ExpenseForm.expense_category)
+async def process_expense_category(message: types.Message, state=FSMContext):
+    # ExpenseForm.category = message.text
+    await state.update_data(expense_category=message.text)
+
+    await state.set_state(ExpenseForm.expense_date)
+    await message.answer(
+        "Input expense date \n in format: DD.MM.YYY",
+        reply_markup=kb.exit_kb,
+    )
 
 
+@router.message(ExpenseForm.expense_date)
+async def process_expense_date(message: types.Message, state=FSMContext):
+    try:
+        date = datetime.strptime(message.text, '%d.%m.%Y')
+        date = datetime.date(date)
+
+        await state.update_data(expense_date=date)
+        await state.set_state(ExpenseForm.expense_amount)
+        await message.answer(
+            "Input expense amount",
+            reply_markup=kb.exit_kb,
+        )
+    except:
+        await message.answer(
+            "Input correct expense date \n in format: DD.MM.YYY",
+            reply_markup=kb.exit_kb,
+        )
 
 
-#
-# @router.message(Gen.text_prompt)
-# @flags.chat_action("typing")
-# async def generate_text(msg: Message, state: FSMContext):
-#     prompt = msg.text
-#     mesg = await msg.answer(text.gen_wait)
-#     res = await utils.generate_text(prompt)
-#     if not res:
-#         return await mesg.edit_text(text.gen_error, reply_markup=kb.iexit_kb)
-#     await mesg.edit_text(res[0] + text.text_watermark, disable_web_page_preview=True)
-#
-# @router.callback_query(F.data == "generate_image")
-# async def input_image_prompt(clbck: CallbackQuery, state: FSMContext):
-#     await state.set_state(Gen.img_prompt)
-#     await clbck.message.edit_text(text.gen_image)
-#     await clbck.message.answer(text.gen_exit, reply_markup=kb.exit_kb)
-#
-# @router.message(Gen.img_prompt)
-# @flags.chat_action("upload_photo")
-# async def generate_image(msg: Message, state: FSMContext):
-#     prompt = msg.text
-#     mesg = await msg.answer(text.gen_wait)
-#     img_res = await utils.generate_image(prompt)
-#     if len(img_res) == 0:
-#         return await mesg.edit_text(text.gen_error, reply_markup=kb.iexit_kb)
-#     await mesg.delete()
-#     await mesg.answer_photo(photo=img_res[0], caption=text.img_watermark)
+@router.message(ExpenseForm.expense_amount)
+async def process_expense_amount(message: types.Message, state=FSMContext):
+    try:
+        await state.update_data(expense_amount=float(message.text))
+
+
+    except:
+        return await message.answer(
+            "Input correct amount",
+            reply_markup=kb.exit_kb,
+        )
+    await state.set_state(ExpenseForm.expense_narration)
+    await message.answer(
+        "Input expense narration",
+        reply_markup=kb.exit_kb,)
+
+
+@router.message(ExpenseForm.expense_narration)
+async def process_expense_narration(message: types.Message, state=FSMContext):
+
+    try:
+        await state.update_data(expense_narration=message.text)
+
+    except:
+        await message.answer(
+            "Input correct narration",
+            reply_markup=kb.exit_kb,
+        )
+    await state.set_state(ExpenseForm.expense_is_ready)
+    # await message.answer(text.expense_confirmation.format(category=ExpenseForm.category, date=ExpenseForm.expense_date),
+    #                      reply_markup=kb.expense_confirmation_kb)
+    data = await state.get_data()
+
+    await message.answer(text.confirmation.format(
+        category=data['expense_category'],
+        date=data['expense_date'].strftime("%d.%m.%Y"),
+        ammount=data['expense_amount'],
+        narration=data['expense_narration']
+    ), reply_markup=kb.expense_confirmation_kb)
+
+
+@router.callback_query(F.data == "post_expense", ExpenseForm.expense_is_ready)
+async def add_expense(callback: CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    await state.update_data(expense_category=ExpenseForm.categories_dict[data['expense_category']])
+    data = await state.get_data()
+
+    params = {
+        "user": utils.get_user(callback)["user"],
+        "category": data["expense_category"],
+        "date": data["expense_date"].strftime("%Y.%m.%d"),
+        "amount": data["expense_amount"],
+        "narration": data["expense_narration"],
+    }
+    print(params)
+    await callback.message.answer(utils.post_expense(params), reply_markup=kb.exit_kb)
+
