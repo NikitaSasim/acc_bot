@@ -1,4 +1,10 @@
-BOT_TOKEN = "6289859327:AAGOCeb5s7413vrlJx6qIhAQE5QnMfQIlts"
-OPENAI_TOKEN = "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"
-ACC_TOKEN = "fdsf57hl8sl8H7cH&huhcsd7re8hH&kksdch&H473fc8HH74hf"
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+BOT_TOKEN = os.environ.get('BOT_TOKEN')
+OPENAI_TOKEN = os.environ.get('OPENAI_TOKEN')
+ACC_TOKEN = os.environ.get('ACC_TOKEN')
+
 # BOT_TOKEN = "5720465605:AAHf_wB4sFNdcjhQjf5_INs4MFeMUB6YyLg"
