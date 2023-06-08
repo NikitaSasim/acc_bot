@@ -5,6 +5,7 @@ import requests
 from aiogram.types import Message, CallbackQuery
 
 import config
+import text
 
 import json
 
@@ -28,24 +29,26 @@ async def set_id(message: Message):
 def gpt(callback: CallbackQuery):
 
     openai.api_key = config.OPENAI_TOKEN
-    print(openai.api_key)
+
     model_engine = "gpt-3.5-turbo"
     data = str(get_user(callback))
-    print(data)
-    prompt = f'look at this json, analyze my income and expenses and give your recommendations: {data}'
-    print(prompt)
-    response = openai.Completion.create(
-        model="text-davinci-003",
-        prompt=prompt,
-        temperature=0.9,
-        max_tokens=150,
-        top_p=1,
-        frequency_penalty=0.0,
-        presence_penalty=0.6,
-        stop=[" Human:", " AI:"]
-    )
 
-    return(response.choices[0].text)
+    prompt = f'look at this json, analyze my income and expenses and give your recommendations: {data}'
+    try:
+        response = openai.Completion.create(
+            model="text-davinci-003",
+            prompt=prompt,
+            temperature=0.9,
+            max_tokens=150,
+            top_p=1,
+            frequency_penalty=0.0,
+            presence_penalty=0.6,
+            stop=[" Human:", " AI:"]
+        )
+
+        return(response.choices[0].text)
+    except:
+        return text.gpt_error
 
 
 def incomes_categories(callback: CallbackQuery):
@@ -63,6 +66,22 @@ def incomes_categories(callback: CallbackQuery):
 
     return categories, categories_names
 
+def expenses_categories(callback: CallbackQuery):
+    user_id = callback.from_user.id
+
+    url = "http://127.0.0.1:8000/api/expenses_categories/"
+    params = {
+        'user': user_id,
+    }
+    response = requests.get(url, params)
+    print(response.content)
+    categories = {item['name']: item['id'] for item in response.json()}
+    print(categories)
+    categories_names = tuple(categories)
+    print(categories_names)
+
+    return categories, categories_names
+
 
 def get_user(callback: CallbackQuery):
     user_id = callback.from_user.id
@@ -74,7 +93,7 @@ def get_user(callback: CallbackQuery):
         'token': acc_token
     }
     response = requests.get(url, params)
-    print(response.json())
+
 
     return response.json()
 
@@ -84,6 +103,20 @@ def post_income(data):
 
     response = requests.post(url, data=data)
 
+    if response.status_code == 201:
+        return text.data_saved
+    else:
+        return text.data_unsaved
 
-    return response.status_code
+def post_expense(data):
+    url = "http://127.0.0.1:8000/api/post_expense/"
+
+    response = requests.post(url, data=data)
+
+    if response.status_code == 201:
+        return text.data_saved
+    else:
+        return text.data_unsaved
+
+
 

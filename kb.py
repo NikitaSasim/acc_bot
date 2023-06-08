@@ -2,7 +2,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardBu
 
 menu = [
     [InlineKeyboardButton(text="💰 Add income", callback_data="income"),
-    InlineKeyboardButton(text="💳 Add expense", callback_data="expense")],
+    InlineKeyboardButton(text="💳 Add expenses", callback_data="expense")],
     [InlineKeyboardButton(text="🧠 Get recommendations", callback_data="recommendations")]
 ]
 
@@ -13,5 +13,9 @@ iexit_kb = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="◀
 exit_key = KeyboardButton(text="◀️ Exit to main menu")
 income_confirmation_kb = InlineKeyboardMarkup(inline_keyboard=[
                                                             [InlineKeyboardButton(text="Yes", callback_data="post_income"),
+                                                             InlineKeyboardButton(text="No", callback_data="menu")]
+                                                            ])
+expense_confirmation_kb = InlineKeyboardMarkup(inline_keyboard=[
+                                                            [InlineKeyboardButton(text="Yes", callback_data="post_expense"),
                                                              InlineKeyboardButton(text="No", callback_data="menu")]
                                                             ])
