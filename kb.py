@@ -2,7 +2,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardBu
 
 menu = [
     [InlineKeyboardButton(text="💰 Add income", callback_data="income"),
-    InlineKeyboardButton(text="💳 Add expense", callback_data="expense")],
+    InlineKeyboardButton(text="💳 Add expenses", callback_data="expense")],
     [InlineKeyboardButton(text="🧠 Get recommendations", callback_data="recommendations")]
 ]
 

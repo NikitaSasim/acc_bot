@@ -29,24 +29,26 @@ async def set_id(message: Message):
 def gpt(callback: CallbackQuery):
 
     openai.api_key = config.OPENAI_TOKEN
-    print(openai.api_key)
+
     model_engine = "gpt-3.5-turbo"
     data = str(get_user(callback))
-    print(data)
-    prompt = f'look at this json, analyze my income and expenses and give your recommendations: {data}'
-    print(prompt)
-    response = openai.Completion.create(
-        model="text-davinci-003",
-        prompt=prompt,
-        temperature=0.9,
-        max_tokens=150,
-        top_p=1,
-        frequency_penalty=0.0,
-        presence_penalty=0.6,
-        stop=[" Human:", " AI:"]
-    )
 
-    return(response.choices[0].text)
+    prompt = f'look at this json, analyze my income and expenses and give your recommendations: {data}'
+    try:
+        response = openai.Completion.create(
+            model="text-davinci-003",
+            prompt=prompt,
+            temperature=0.9,
+            max_tokens=150,
+            top_p=1,
+            frequency_penalty=0.0,
+            presence_penalty=0.6,
+            stop=[" Human:", " AI:"]
+        )
+
+        return(response.choices[0].text)
+    except:
+        return text.gpt_error
 
 
 def incomes_categories(callback: CallbackQuery):
