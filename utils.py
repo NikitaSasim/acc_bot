@@ -16,7 +16,7 @@ async def set_id(message: Message):
     if len(message_list) == 2:
         key = message_list[1]
         print(key)
-        url = os.environ.get('URL') + "/api/add_tg/"
+        url = config.URL + "/api/add_tg/"
         data = {
             "key": key,
             "user": message.from_user.id,
@@ -54,7 +54,7 @@ def gpt(callback: CallbackQuery):
 def incomes_categories(callback: CallbackQuery):
     user_id = callback.from_user.id
 
-    url = os.environ.get('URL') + "/api/incomes_categories/"
+    url = config.URL + "/api/incomes_categories/"
     params = {
         'user': user_id,
     }
@@ -69,7 +69,7 @@ def incomes_categories(callback: CallbackQuery):
 def expenses_categories(callback: CallbackQuery):
     user_id = callback.from_user.id
 
-    url = os.environ.get('URL') + "/api/expenses_categories/"
+    url = config.URL + "/api/expenses_categories/"
     params = {
         'user': user_id,
     }
@@ -86,7 +86,7 @@ def expenses_categories(callback: CallbackQuery):
 def get_user(callback: CallbackQuery):
     user_id = callback.from_user.id
     print(user_id)
-    url = os.environ.get('URL') + "/api/user/"
+    url = config.URL + "/api/user/"
 
     params = {
         'user': user_id,
@@ -99,7 +99,7 @@ def get_user(callback: CallbackQuery):
 
 
 def post_income(data):
-    url = os.environ.get('URL') + "/api/post_income/"
+    url = config.URL + "/api/post_income/"
 
     response = requests.post(url, data=data)
 
@@ -109,7 +109,7 @@ def post_income(data):
         return text.data_unsaved
 
 def post_expense(data):
-    url = os.environ.get('URL') + "/api/post_expense/"
+    url = config.URL + "/api/post_expense/"
 
     response = requests.post(url, data=data)
 
