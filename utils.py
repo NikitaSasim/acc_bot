@@ -4,10 +4,10 @@ import os
 import requests
 from aiogram.types import Message, CallbackQuery
 
-import config
+
 import text
 
-import json
+
 
 acc_token = config.ACC_TOKEN
 
