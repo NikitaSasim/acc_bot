@@ -148,8 +148,7 @@ async def process_income_narration(message: types.Message, state=FSMContext):
             reply_markup=kb.exit_kb,
         )
     await state.set_state(Form.income_is_ready)
-    # await message.answer(text.income_confirmation.format(category=Form.category, date=Form.income_date),
-    #                      reply_markup=kb.income_confirmation_kb)
+
     data = await state.get_data()
 
     await message.answer(text.confirmation.format(

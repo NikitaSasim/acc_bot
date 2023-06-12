@@ -6,7 +6,7 @@ from aiogram.types import Message, CallbackQuery
 
 
 import text
-
+import config
 
 
 acc_token = config.ACC_TOKEN
