@@ -93,6 +93,7 @@ def get_user(callback: CallbackQuery):
         'token': acc_token
     }
     response = requests.get(url, params)
+    print(response.status_code)
 
 
     return response.json()
