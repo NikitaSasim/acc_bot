@@ -1,6 +1,6 @@
 ../test/config.py
 .idea
-
+config.py
 **/env/
 **/venv/
 cache/
