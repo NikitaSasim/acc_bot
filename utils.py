@@ -3,20 +3,20 @@ import logging
 import os
 import requests
 from aiogram.types import Message, CallbackQuery
-
-
 import text
-import config
 
+from dotenv import load_dotenv
+load_dotenv()
 
-acc_token = config.ACC_TOKEN
+acc_token = os.getenv("ACC_TOKEN")
+base_url = URL = os.getenv("URL")
 
 async def set_id(message: Message):
     message_list = message.text.split()
     if len(message_list) == 2:
         key = message_list[1]
         print(key)
-        url = config.URL + "/api/add_tg/"
+        url = base_url + "/api/add_tg/"
         data = {
             "key": key,
             "user": message.from_user.id,
@@ -28,7 +28,7 @@ async def set_id(message: Message):
 
 def gpt(callback: CallbackQuery):
 
-    openai.api_key = config.OPENAI_TOKEN
+    openai.api_key = os.getenv("OPENAI_TOKEN")
 
     model_engine = "gpt-3.5-turbo"
     data = str(get_user(callback))
@@ -54,7 +54,7 @@ def gpt(callback: CallbackQuery):
 def incomes_categories(callback: CallbackQuery):
     user_id = callback.from_user.id
 
-    url = config.URL + "/api/incomes_categories/"
+    url = base_url + "/api/incomes_categories/"
     params = {
         'user': user_id,
     }
@@ -69,7 +69,7 @@ def incomes_categories(callback: CallbackQuery):
 def expenses_categories(callback: CallbackQuery):
     user_id = callback.from_user.id
 
-    url = config.URL + "/api/expenses_categories/"
+    url = base_url + "/api/expenses_categories/"
     params = {
         'user': user_id,
     }
@@ -86,7 +86,7 @@ def expenses_categories(callback: CallbackQuery):
 def get_user(callback: CallbackQuery):
     user_id = callback.from_user.id
     print(user_id)
-    url = config.URL + "/api/user/"
+    url = base_url + "/api/user/"
 
     params = {
         'user': user_id,
@@ -100,7 +100,7 @@ def get_user(callback: CallbackQuery):
 
 
 def post_income(data):
-    url = config.URL + "/api/post_income/"
+    url = base_url + "/api/post_income/"
 
     response = requests.post(url, data=data)
 
@@ -110,7 +110,7 @@ def post_income(data):
         return text.data_unsaved
 
 def post_expense(data):
-    url = config.URL + "/api/post_expense/"
+    url = base_url + "/api/post_expense/"
 
     response = requests.post(url, data=data)
 

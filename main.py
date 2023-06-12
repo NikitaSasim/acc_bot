@@ -1,11 +1,14 @@
 import asyncio
 import logging
-import config
+
 from aiogram import Bot, Dispatcher
 from aiogram.enums.parse_mode import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.utils.chat_action import ChatActionMiddleware
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 
@@ -13,7 +16,7 @@ from handlers import router
 
 
 async def main():
-    bot = Bot(token=config.BOT_TOKEN, parse_mode=ParseMode.HTML)
+    bot = Bot(token=os.getenv("BOT_TOKEN"), parse_mode=ParseMode.HTML)
     dp = Dispatcher(storage=MemoryStorage())
     dp.include_router(router)
     await bot.delete_webhook(drop_pending_updates=True)
